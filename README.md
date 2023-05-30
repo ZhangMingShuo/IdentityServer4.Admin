@@ -812,3 +812,11 @@ https://www.paypal.me/skoruba
 
 ### Patreon
 https://www.patreon.com/skoruba
+
+
+### sqllocaldb
+```sh
+sqllocaldb create identityadmindb
+sqllocaldb start identityadmindb
+sqllocaldb info identityadmindb
+```
