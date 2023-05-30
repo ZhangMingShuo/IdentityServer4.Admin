@@ -1,10 +1,20 @@
-﻿using System;
+﻿using System.Reflection;
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Skoruba.IdentityServer4.Shared.Configuration.Helpers;
+using Skoruba.IdentityServer4.STS.Identity.Configuration.Constants;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Configuration.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Interfaces;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Configuration.SqlServer;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Configuration.PostgreSQL;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Configuration.MySql;
 
 namespace Skoruba.IdentityServer4.STS.Identity
 {
@@ -38,8 +48,9 @@ namespace Skoruba.IdentityServer4.STS.Identity
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var isDevelopment = environment == Environments.Development;
 
+            var curDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\";//Directory.GetCurrentDirectory()
             var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(curDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                 .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
@@ -64,6 +75,17 @@ namespace Skoruba.IdentityServer4.STS.Identity
             Host.CreateDefaultBuilder(args)
                  .ConfigureAppConfiguration((hostContext, configApp) =>
                  {
+                    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                    var isDevelopment = environment == Environments.Development;
+
+                    var curDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\";//Directory.GetCurrentDirectory()
+
+                    configApp.SetBasePath(curDirectory)
+                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile($"serilog.{environment}.json", optional: true, reloadOnChange: true);
+
                      var configurationRoot = configApp.Build();
 
                      configApp.AddJsonFile("serilog.json", optional: true, reloadOnChange: true);
